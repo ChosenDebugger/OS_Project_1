@@ -106,7 +106,7 @@ namespace OS_Project_1
                 buttonName += (i + 1).ToString();
                 Button obj = FindName(buttonName) as Button;
 
-                if (elevator[currentElevator].eControl.inLightStatus[i] == 1) { obj.Background = Brushes.LightYellow; }
+                if (elevator[currentElevator].eControl.inLightStatus[i] == 1) { obj.Background = Brushes.ForestGreen; }
                 if (elevator[currentElevator].eControl.inLightStatus[i] == 0) { obj.Background = Brushes.White; }
             }
         }

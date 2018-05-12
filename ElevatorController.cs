@@ -39,12 +39,12 @@ namespace OS_Project_1
                 if (WhetherStop())
                 {
                     this.eControl.eStatus = 0;
-                    Thread.Sleep(1500);
                     this.ElvatorStop();
+                    Thread.Sleep(1500);
                 }
                 this.elevatorText.Dispatcher.Invoke(Move);
 
-                Thread.Sleep(500);
+                Thread.Sleep(1500);
             }
 
         }
@@ -101,12 +101,18 @@ namespace OS_Project_1
                 for (int i = eControl.currentFloor - 1; i < 20; i++)
                 {
                     if (eControl.inTarget[i] == 1 || eControl.outTarget[0][i] == 1 || eControl.outTarget[1][i] == 1)
+                    {
                         distanceUp = i + 1 - eControl.currentFloor;
+                        break;
+                    }
                 }
-                for(int i=eControl.currentFloor-1;i>=0;i--)
+                for (int i = eControl.currentFloor - 1; i >= 0; i--)
                 {
                     if (eControl.inTarget[i] == 1 || eControl.outTarget[0][i] == 1 || eControl.outTarget[1][i] == 1)
+                    {
                         distanceDown = eControl.currentFloor - (i + 1);
+                        break;
+                    }
                 }
                 if (distanceUp <= distanceDown) { eControl.currentTarget = eControl.currentFloor + distanceUp; }
                 if (distanceUp > distanceDown) { eControl.currentTarget = eControl.currentFloor - distanceDown; }
