@@ -28,15 +28,13 @@ namespace OS_Project_1
     /// </summary>
     public partial class MainWindow : Window
     {
-        public int currentElevator;                                         //电梯ID
+        public int currentElevator;                                         //当前框选电梯ID
 
         public DispatcherTimer timer = new DispatcherTimer();               //计时器
 
         public ElevatorController[] elevator = new ElevatorController[5];   //电梯控制器实例
 
-        public Queue<int> allRequest = new Queue<int>();                    //为分配器存放请求
-        
-
+        private int[] outLightStatus = new int[20];                         //标识外部亮灯情况
 
         public MainWindow()
         {
@@ -67,52 +65,68 @@ namespace OS_Project_1
             ele4.Start(elevator4);
             ele5.Start(elevator5);
 
-            timer.Interval = TimeSpan.FromMilliseconds(500);
+            //v1.5优化
+            //合理安排按钮与电梯状态的切换
+            //（声明多个计时器同时运作
+            timer.Interval = TimeSpan.FromMilliseconds(100);                 //设定计时器时间间隔为500 ms
+
             timer.Start();
-            timer.Tick += new EventHandler(UpdateInLight);
-            timer.Tick += new EventHandler(UpdateOutLight);
-            timer.Tick += new EventHandler(TargetAssign);
+            timer.Tick += new EventHandler(UpdateInMessage);
+            timer.Tick += new EventHandler(UpdateOutMessage);
+        }
+
+        //v1.5 结构优化之后这里应根据请求状态变色
+        //1.控制外部楼层灯
+        //
+        private void UpdateLight(object sender,EventArgs e)
+        {
 
         }
 
-        //可以合并 ①
-        //用于控制电梯内部按钮灯
-        //需要依靠Elevator 内部变量inTarget 来判断
-        //v1.0
-        public void UpdateInLight(object sender, EventArgs e)
+        public void UpdateInMessage(object sender, EventArgs e)
         {
+            //用于控制电梯内部按钮灯
+            //需要依靠Elevator 内部变量inTarget 来判断
+            //v1.0
+
+            Label labelNum = FindName("Label1") as Label;
+
+            labelNum.Content = (elevator[currentElevator].eControl.currentFloor).ToString();
+
+            Label labelStatus = FindName("Label2") as Label;
+
+            if (elevator[currentElevator].eControl.eStatus == 1) labelStatus.Content = "↑";
+            if (elevator[currentElevator].eControl.eStatus == 0) labelStatus.Content = " - ";
+            if (elevator[currentElevator].eControl.eStatus == -1) labelStatus.Content = "↓";
+
+
             for (int i = 0; i < 20; i++)
             {
                 string buttonName = @"button";
                 buttonName += (i + 1).ToString();
+                Button obj = FindName(buttonName) as Button;
 
-                if (elevator[currentElevator].eControl.inTarget[i] == 2)
-                {
-                    TurnPressButton(FindName(buttonName) as Button);
-                }
-                if (elevator[currentElevator].eControl.inTarget[i] == 0)
-                {
-                    TurnUnPressButton(FindName(buttonName) as Button);
-                }
+                if (elevator[currentElevator].eControl.inLightStatus[i] == 1) { obj.Background = Brushes.LightYellow; }
+                if (elevator[currentElevator].eControl.inLightStatus[i] == 0) { obj.Background = Brushes.White; }
             }
         }
 
-        //v1.0
-        //可以合并②
-        //用于控制外部的上下请求灯
-        //需要依靠Elevator 内部变量outTarget 来判断
-
-        //v2.0 优化1
-        public void UpdateOutLight(object sender, EventArgs e)
+        public void UpdateOutMessage(object sender, EventArgs e)
         {
+            //v1.0
+            //用于控制外部的上下请求灯  √
+            //需要依靠Elevator 内部变量outTarget 来判断
+
+            //v2.0 优化1
+
             for (int i = 0; i < 20; i++)
             {
                 string buttonName = @"button";
                 buttonName += (i + 21).ToString();
                 for (int j = 0; j < 5; j++)
                 {
-                    //Console.WriteLine("HelloWorld");
-                    if (elevator[j].eControl.outTarget[0][i] == 2)
+                    //Console.WriteLine("123123");
+                    if (elevator[j].eControl.outTarget[0][i] == 1)
                     {
                         TurnPressButton(FindName(buttonName) as Button);
                         break;
@@ -126,7 +140,7 @@ namespace OS_Project_1
                 buttonName += (i + 21).ToString();
                 for (int j = 0; j < 5; j++)
                 {
-                    if (elevator[j].eControl.outTarget[1][i - 20] == 2)
+                    if (elevator[j].eControl.outTarget[1][i - 20] == 1)
                     {
                         TurnPressButton(FindName(buttonName) as Button);
                         break;
@@ -136,61 +150,61 @@ namespace OS_Project_1
             }
         }
 
+
+
+
+
+
+
  //按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应//
  //按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应//
 
-        //选择当前操作电梯
+        private void Button_Click_inRequest(object sender, RoutedEventArgs e)
+        {
+            //电梯内部请求
+            //更新inTarget状态√
+
+            //if (!WhetherResponse(sender, e)) return;
+
+            int buttonID = (sender as Button).TabIndex;
+
+            
+            elevator[currentElevator].eControl.inLightStatus[buttonID - 1] = 1;     //亮灯
+            elevator[currentElevator].eControl.inTarget[buttonID - 1] = 1;
+
+
+            elevator[currentElevator].eControl.toDeal++;
+        }
+
+        private void Button_Click_outRequest(object sender, RoutedEventArgs e)
+        {
+            //电梯外部请求
+            //更新outTarget状态     √
+            //待处理请求+1          √
+
+            //if (!WhetherResponse(sender, e)) return;
+
+            int buttonID = (sender as Button).TabIndex;
+
+            TargetAssign(sender, e, buttonID + 20);
+        }
+
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //选择当前操作电梯
             currentElevator = whichElevator.SelectedIndex;
         }
 
-        //电梯内部请求
-        //判断请求是否合理
-        //更新inTarget状态√
-        private void Button_Click_eFloor(object sender, RoutedEventArgs e)
+        //v1.5 优化变色效果
+        private void TurnPressButton(Button obj)
         {
-            int buttonID = (sender as Button).TabIndex;
-
-            elevator[currentElevator].eControl.inTarget[buttonID - 1] = 2;
-
-            elevator[currentElevator].eControl.toDeal++;
-        }
-
-        //电梯外部请求
-        //判断请求是否合理
-        //更新outTarget状态     √
-        //待处理请求+1          √
-        private void Button_Click_FloorUpDown(object sender, RoutedEventArgs e)
-        {
-            int buttonID = (sender as Button).TabIndex;
-
-            allRequest.Enqueue(buttonID + 20);
-
-            /*
-            if (1 <= buttonID && buttonID <= 20)
-            {
-                //elevator[currentElevator].eControl.typeOfOutTarget = 0;
-                elevator[currentElevator].eControl.outTarget[0][buttonID - 1] = 2;
-            }
-            if (21 <= buttonID && buttonID <= 40)
-            {
-                //elevator[currentElevator].eControl.typeOfOutTarget = 1;
-                elevator[currentElevator].eControl.outTarget[1][buttonID - 21] = 2;
-            }
-            
-            elevator[currentElevator].eControl.toDeal++;
-            */
-        }
-
-        //按钮处于按下状态
-        public void TurnPressButton(Button obj)
-        {
+            //按钮处于按下状态
             obj.Background = Brushes.Red;
         }
-        //按钮处于松开状态
-        public void TurnUnPressButton(Button obj)
+
+        private void TurnUnPressButton(Button obj)
         {
+            //按钮处于松开状态
             obj.Background = Brushes.White;
         }
 
@@ -208,12 +222,8 @@ namespace OS_Project_1
         //  ②若没有同向电梯 ->在静止电梯中找到距离最近
         //Ⅲ分配Target
 
-        public void TargetAssign(object sender, EventArgs e)
+        public void TargetAssign(object sender, EventArgs e,int buttonID)
         {
-            if (allRequest.Count == 0) return;
-            
-            int buttonID = allRequest.Dequeue();
-
             int[] distance1 = new int[5];                           //顺路电梯距离请求的位置
             int[] distance2 = new int[5];                           //静止电梯距离请求的距离
 
@@ -257,7 +267,7 @@ namespace OS_Project_1
 
                 if (minDistance < 20)
                 {
-                    elevator[closestEleID].eControl.outTarget[0][floor - 1] = 2;
+                    elevator[closestEleID].eControl.outTarget[0][floor - 1] = 1;
                     elevator[closestEleID].eControl.toDeal++;
                     return;
                 }
@@ -272,7 +282,7 @@ namespace OS_Project_1
 
                 if (minDistance < 20)
                 {
-                    elevator[closestEleID].eControl.outTarget[0][floor - 1] = 2;
+                    elevator[closestEleID].eControl.outTarget[0][floor - 1] = 1;
                     elevator[closestEleID].eControl.toDeal++;
                     return;
                 }
@@ -313,7 +323,7 @@ namespace OS_Project_1
 
                 if (minDistance < 20)
                 {
-                    elevator[closestEleID].eControl.outTarget[1][floor - 1] = 2;
+                    elevator[closestEleID].eControl.outTarget[1][floor - 1] = 1;
                     elevator[closestEleID].eControl.toDeal++;
                     return;
                 }
@@ -327,11 +337,21 @@ namespace OS_Project_1
                     }
                 if (minDistance < 20)
                 {
-                    elevator[closestEleID].eControl.outTarget[1][floor - 1] = 2;
+                    elevator[closestEleID].eControl.outTarget[1][floor - 1] = 1;
                     elevator[closestEleID].eControl.toDeal++;
                     return;
                 }
             }
+        }
+
+        private bool WhetherResponse_In(object sender, RoutedEventArgs e)
+        {
+            //v1.5新增
+            //判断是否要响应该指令
+            //在Button 触发后第一时间被调用并进行判断
+
+            
+            return true;
         }
           
     }

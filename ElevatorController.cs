@@ -34,19 +34,15 @@ namespace OS_Project_1
 
             while (true)
             {
-                while (true)
-                {
-                    SetTarget();
-                    if (eControl.eStatus != 0) break;
-                }
+                SetTarget();
 
                 if (WhetherStop())
                 {
+                    this.eControl.eStatus = 0;
                     Thread.Sleep(1500);
                     this.ElvatorStop();
                 }
-                else
-                    this.elevatorText.Dispatcher.Invoke(Move);
+                this.elevatorText.Dispatcher.Invoke(Move);
 
                 Thread.Sleep(500);
             }
@@ -65,12 +61,12 @@ namespace OS_Project_1
             {
                 for (int i = eControl.currentTarget - 1; i > eControl.currentFloor; i--)
                 {
-                    if (eControl.inTarget[i] == 2)
+                    if (eControl.inTarget[i] == 1)
                     {
                         eControl.currentTarget = i + 1;
                         eControl.typeOfOutTarget = -1;
                     }
-                    if (eControl.outTarget[0][i] == 2)
+                    if (eControl.outTarget[0][i] == 1)
                     {
                         eControl.currentTarget = i + 1;
                         eControl.typeOfOutTarget = 0;   
@@ -83,12 +79,12 @@ namespace OS_Project_1
             {
                 for (int i = eControl.currentTarget + 1; i < eControl.currentFloor; i++)
                 {
-                    if (eControl.inTarget[i] == 2)
+                    if (eControl.inTarget[i] == 1)
                     {
                         eControl.currentTarget = i + 1;
                         eControl.typeOfOutTarget = -1;
                     }
-                    if(eControl.outTarget[1][i] == 2)
+                    if(eControl.outTarget[1][i] == 1)
                     {
                         eControl.currentTarget = i + 1;
                         eControl.typeOfOutTarget = 1;
@@ -104,22 +100,22 @@ namespace OS_Project_1
 
                 for (int i = eControl.currentFloor - 1; i < 20; i++)
                 {
-                    if (eControl.inTarget[i] == 2 || eControl.outTarget[0][i] == 2 || eControl.outTarget[1][i] == 2)
+                    if (eControl.inTarget[i] == 1 || eControl.outTarget[0][i] == 1 || eControl.outTarget[1][i] == 1)
                         distanceUp = i + 1 - eControl.currentFloor;
                 }
                 for(int i=eControl.currentFloor-1;i>=0;i--)
                 {
-                    if (eControl.inTarget[i] == 2 || eControl.outTarget[0][i] == 2 || eControl.outTarget[1][i] == 2)
+                    if (eControl.inTarget[i] == 1 || eControl.outTarget[0][i] == 1 || eControl.outTarget[1][i] == 1)
                         distanceDown = eControl.currentFloor - (i + 1);
                 }
                 if (distanceUp <= distanceDown) { eControl.currentTarget = eControl.currentFloor + distanceUp; }
                 if (distanceUp > distanceDown) { eControl.currentTarget = eControl.currentFloor - distanceDown; }
 
-                if (eControl.inTarget[eControl.currentTarget - 1] == 2)
+                if (eControl.inTarget[eControl.currentTarget - 1] == 1)
                     eControl.typeOfOutTarget = -1;
-                if (eControl.outTarget[0][eControl.currentTarget - 1] == 2)
+                if (eControl.outTarget[0][eControl.currentTarget - 1] == 1)
                     eControl.typeOfOutTarget = 0;
-                if (eControl.outTarget[1][eControl.currentTarget - 1] == 2)
+                if (eControl.outTarget[1][eControl.currentTarget - 1] == 1)
                     eControl.typeOfOutTarget = 1;
             }
             SetDirection();
@@ -156,113 +152,38 @@ namespace OS_Project_1
         //待处理请求-1
         public void ElvatorStop()
         {
-
             int floor = eControl.currentFloor;
 
-            if (eControl.inTarget[floor - 1] == 2) { eControl.inTarget[floor - 1] = 0; }
+            if (eControl.inTarget[floor - 1] == 1) { eControl.inTarget[floor - 1] = 0; }
 
             if (eControl.typeOfOutTarget == 0 || eControl.typeOfOutTarget == 1)
-                if (eControl.outTarget[eControl.typeOfOutTarget][floor - 1] == 2)
+                if (eControl.outTarget[eControl.typeOfOutTarget][floor - 1] == 1)
                     eControl.outTarget[eControl.typeOfOutTarget][floor - 1] = 0;
 
+            eControl.inLightStatus[floor - 1] = 0;
             eControl.toDeal--;
             eControl.currentTarget = -1;
-            eControl.eStatus = 0;
 
             return;
-
-            /* if (eControl.eStatus == 1)
-             {
-                 //总有为了↓按钮而上升的情况
-
-                 if (eControl.inTarget[floor - 1] == 2) { eControl.inTarget[floor - 1] = 0; }
-                 if (eControl.outTarget[0][floor - 1] == 2) { eControl.outTarget[0][floor - 1] = 0; }
-             }
-             if (eControl.eStatus == -1)
-             {
-                 //同样
-                 //总有为了↑按钮而下降的情况
-
-                 if (eControl.inTarget[floor - 1] == 2) { eControl.inTarget[floor - 1] = 0; }
-                 if (eControl.outTarget[1][floor - 1] == 2) { eControl.outTarget[1][floor - 1] = 0; }
-             }*/
-            //该类请求应该会在Button 触发函数被拒绝掉
-            //if (eControl.eStatus == 0) { }
         }
 
-    }
-}
-
-/*
-public void SetTarget()
-{
-    //没有考虑当层有请求的情况
-    //没有考虑运行中接收到另一指令的情况----------------------------------------------------->使用待处理请求数来解决
-    if (eControl.eStatus == 1)
-    {
-        for (int i = eControl.currentTarget; i >= eControl.currentFloor - 1; i--)
+        //控制电梯内部按钮以及信息（上楼下楼开门）显示函数
+        /*private void UpdateMessage()
         {
-            if (eControl.outTarget[0][i] == 2)
+            for(int i=0;i<20;i++)
             {
-                eControl.currentTarget = i + 1;
+                if(eControl.inLightStatus[i]==1)
+                    TurnOnLight()
+                    
             }
         }
-    }
-    else if (eControl.eStatus == -1)
-    {
-        for (int i = eControl.currentTarget; i <= eControl.currentFloor - 1; i++)
+        private void TurnOnLight()
         {
-            if (eControl.outTarget[1][i] == 2)
-            {
-                eControl.currentTarget = i + 1;
-            }
-        }
-    }
-    else if (eControl.eStatus == 0)
-    {
-        bool flag = false;                                          //标记检索途中是否真的有target
-        int distanceUp = 0, distanceDown = 0;
 
-        for (int i = eControl.currentFloor; i < 20; i++)
+        }
+        private void TurnDownLight()
         {
-            distanceUp++;
-            if (eControl.outTarget[0][i] == 2 || eControl.outTarget[1][i] == 2) { flag = true; break; }
-        }
-        if (!flag) distanceUp = 999;
-        flag = false;
 
-        for (int i = eControl.currentFloor; i >= 0; i--)
-        {
-            distanceDown++;
-            if (eControl.outTarget[0][i] == 2 || eControl.outTarget[1][i] == 2) { flag = true; break; }
-        }
-        if (!flag) distanceDown = 999;
-        flag = false;
-
-        //there maybe problem here
-        if (distanceUp <= distanceDown) eControl.currentTarget = eControl.currentFloor + distanceUp;
-        if (distanceUp > distanceDown) eControl.currentTarget = eControl.currentFloor - distanceDown;
-
-    }
-    SetDirection();
-}*/
-
-
-//存在问题：无法判断电梯是冲着向上键还是向下键来的
-/*
-public void WhetherArrive()
-{
-    if (eControl.currentFloor == eControl.currentTarget)
-    {
-        if (eControl.eStatus == 1)
-            eControl.outTarget[0][eControl.currentTarget - 1] = 0;
-
-        if (eControl.eStatus == -1)
-            eControl.outTarget[1][eControl.currentTarget - 1] = 0;
-
-        eControl.eStatus = 0;
-        eControl.currentTarget = -1;
-        //if (eControl.upTarget[eControl.currentFloor] == 2)
+        }*/
     }
 }
-*/

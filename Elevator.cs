@@ -22,7 +22,8 @@ namespace OS_Project_1
         //public int[] upTarget = new int[20];                                    //电梯上方的目的地状态 1有请求；0没请求
         //public int[] downTarget = new int[20];                                  //电梯下方的目的地状态 1有请求；0没请求
 
-        public int eLightStatus;                                                //电梯内部的运行状态灯 1->up; 0->stay; -1->down
+        public int[] inLightStatus = new int[20];                                //电梯内部的楼层状态灯
+
 
         public Elevator()
         {
