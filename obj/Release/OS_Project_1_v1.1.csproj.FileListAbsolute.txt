@@ -1,0 +1,15 @@
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\bin\Release\OS_Project_1_v1.1.exe.config
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\bin\Release\OS_Project_1_v1.1.exe
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\bin\Release\OS_Project_1_v1.1.pdb
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\MainWindow.g.cs
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\App.g.cs
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\OS_Project_1_v1.1_MarkupCompile.cache
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\OS_Project_1_v1.1_MarkupCompile.lref
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\MainWindow.baml
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\OS_Project_1_v1.1.g.resources
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\OS_Project_1_v1._1.Properties.Resources.resources
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\OS_Project_1_v1.1.csproj.GenerateResource.cache
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\OS_Project_1_v1.1.csproj.CoreCompileInputs.cache
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\OS_Project_1_v1.1.exe
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\OS_Project_1_v1.1.pdb
+C:\Users\齐旭晨\Desktop\好好xiao习\os\Project\OS_Project_1_v1.1\OS_Project_1_v1.1\obj\Release\OS_Project_1_v1.1.csprojResolveAssemblyReference.cache
