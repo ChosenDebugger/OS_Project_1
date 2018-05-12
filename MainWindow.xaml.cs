@@ -35,6 +35,7 @@ namespace OS_Project_1
         public ElevatorController[] elevator = new ElevatorController[5];   //电梯控制器实例
 
         private int[] outLightStatus = new int[20];                         //标识外部亮灯情况
+        private int[] buttonStatus = new int[40];                   
 
         public MainWindow()
         {
@@ -353,6 +354,10 @@ namespace OS_Project_1
             
             return true;
         }
-          
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

@@ -18,7 +18,6 @@ namespace OS_Project_1
         public Elevator eControl = new Elevator();
         public TextBox elevatorText = new TextBox();
         
-
         //Based on the given TargetFloor, set the direction √
         public void SetDirection()
         {
@@ -44,7 +43,7 @@ namespace OS_Project_1
                 }
                 this.elevatorText.Dispatcher.Invoke(Move);
 
-                Thread.Sleep(1500);
+                Thread.Sleep(500);
             }
 
         }
