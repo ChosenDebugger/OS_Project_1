@@ -129,7 +129,7 @@ namespace OS_Project_1
                         break;
                     }
                 }
-                if (distanceUp <= distanceDown) { eControl.currentTarget = eControl.currentFloor + distanceUp; }
+                if (distanceUp <= distanceDown && distanceUp != 999) { eControl.currentTarget = eControl.currentFloor + distanceUp; }
                 if (distanceUp > distanceDown) { eControl.currentTarget = eControl.currentFloor - distanceDown; }
 
                 if (eControl.inTarget[eControl.currentTarget - 1] == 1)
@@ -189,8 +189,8 @@ namespace OS_Project_1
 
         public void ErrorCallback(Label errorLabel)
         {
-            errorLabel.Content = ("  Elevator " + elevatorText.TabIndex + "\n" + "     Error!");
-            errorLabel.FontSize = 72;
+            errorLabel.Content = ("Elevator " + elevatorText.TabIndex + "Error!");
+            errorLabel.FontSize = 16;
             errorLabel.Background = Brushes.DarkRed;
 
             ifNormal = false;

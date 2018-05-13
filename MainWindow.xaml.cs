@@ -127,20 +127,39 @@ namespace OS_Project_1
             //用于控制外部的上下请求灯  √
             //需要依靠Elevator 内部变量outTarget 来判断
 
-            //v2.0 
+            //v2.0 优化1
 
             for (int i = 0; i < 20; i++)
             {
+                string buttonName = @"button";
+                buttonName += (i + 21).ToString();
+
                 for (int j = 0; j < 5; j++)
                 {
-                    if (elevator[j].eControl.outTarget[0][i] == 0)
-                        TurnUnPressButton(i + 21);
-                    if (elevator[j].eControl.outTarget[1][i] == 0)
-                        TurnUnPressButton(i + 41);
+                    //Console.WriteLine("123123");
+                    if (elevator[j].eControl.outTarget[0][i] == 1)
+                    {
+                        TurnPressButton(FindName(buttonName) as Button);
+                        break;
+                    }
+                    TurnUnPressButton(FindName(buttonName) as Button);
+                }
+            }
+            for (int i = 20; i < 40; i++)
+            {
+                string buttonName = @"button";
+                buttonName += (i + 21).ToString();
+                for (int j = 0; j < 5; j++)
+                {
+                    if (elevator[j].eControl.outTarget[1][i - 20] == 1)
+                    {
+                        TurnPressButton(FindName(buttonName) as Button);
+                        break;
+                    }
+                    TurnUnPressButton(FindName(buttonName) as Button);
                 }
             }
         }
-
 
 
         //按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应//
@@ -171,7 +190,6 @@ namespace OS_Project_1
 
             int buttonID = (sender as Button).TabIndex;
 
-            TurnPressButton(buttonID + 20);
             outRequestStatus[buttonID - 1] = 2;
             toAssign++;
         }
@@ -179,16 +197,6 @@ namespace OS_Project_1
         private void Button_Click_Error(object sender, RoutedEventArgs e)
         {
             elevator[currentElevator].ErrorCallback(FindName("LabelError") as Label);
-
-            for (int i = 0; i < 5; i++)
-            {
-                elevator[i].elevatorText.Background = Brushes.DarkRed;
-                while (true)
-                {
-                    Thread.Sleep(100);
-
-                }
-            }
         }
         private void Button_Click_Repair(object sender, RoutedEventArgs e)
         {
@@ -217,17 +225,15 @@ namespace OS_Project_1
         }
 
         //v1.5 优化变色效果
-        private void TurnPressButton(int buttonID)
+        private void TurnPressButton(Button obj)
         {
-            Button obj = (FindName("button" + buttonID.ToString())) as Button;
-
+            //按钮处于按下状态
             obj.Background = Brushes.Red;
         }
 
-        private void TurnUnPressButton(int buttonID)
+        private void TurnUnPressButton(Button obj)
         {
-            Button obj = (FindName("button" + buttonID.ToString())) as Button;
-
+            //按钮处于松开状态
             obj.Background = Brushes.White;
         }
 

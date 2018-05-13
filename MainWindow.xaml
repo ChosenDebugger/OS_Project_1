@@ -138,6 +138,6 @@
         <Label Content="2" Grid.Column="1" HorizontalAlignment="Left" Margin="15,0,0,35" VerticalAlignment="Bottom" Width="25" Height="25"/>
         <Label Content="1" Grid.Column="1" HorizontalAlignment="Left" Margin="15,0,0,5" VerticalAlignment="Bottom" Width="25" Height="25"/>
 
-        <Label Grid.ColumnSpan="4" Name="LabelError" Grid.Column="2" HorizontalAlignment="Center" Height="201" Margin="0,169,43,0" VerticalAlignment="Top" Width="357" Background="Transparent" FontSize="72"/>
+        <Label Grid.ColumnSpan="2" Name="LabelError" Grid.Column="3" HorizontalAlignment="Center" Height="34" Margin="36,10,33,0" VerticalAlignment="Top" Width="131" Background="Transparent" FontSize="16" Content=""/>
     </Grid>
 </Window>
