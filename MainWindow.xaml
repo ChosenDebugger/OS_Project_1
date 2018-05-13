@@ -55,32 +55,26 @@
                 <Label Content="-" Name="Label2" Background="LightGray" BorderBrush="#FF0A4673" Canvas.Left="11" Height="40" Width="22" FontSize="22" Canvas.Top="5"/>
                 <Label Content="1" Name="Label1" Background="LightPink" BorderBrush="AliceBlue" Height="37" Width="36" FontSize="20" Canvas.Top="7" Canvas.Left="56"/>
             </Canvas>
-            <Button Content="&lt;" Canvas.Left="26" Canvas.Top="166" Width="31" Height="27" RenderTransformOrigin="0.5,0.5" Click="Button_Click" FontSize="20">
+            <Button Content="&gt;|&lt;" Canvas.Left="26" Canvas.Top="166" Width="42" Height="31" RenderTransformOrigin="0.5,0.5" Background="#FF8A8282" Click="Button_Click_Close" FontSize="14">
                 <Button.BorderBrush>
                     <ImageBrush/>
                 </Button.BorderBrush>
-                <Button.Background>
-                    <ImageBrush/>
-                </Button.Background>
             </Button>
-            <Button Content="&gt;" Canvas.Left="93" Canvas.Top="166" Width="31" Height="27" FontSize="20">
+            <Button Content="&lt;|&gt;" Canvas.Left="84" Canvas.Top="166" Width="44" Height="31" FontSize="14" Background="#FF8A8282" Click="Button_Click_Open">
                 <Button.BorderBrush>
                     <ImageBrush/>
                 </Button.BorderBrush>
-                <Button.Background>
-                    <ImageBrush/>
-                </Button.Background>
             </Button>
-            <Button Content="故障" Canvas.Left="26" Canvas.Top="102" Width="102" Height="20" Background="#FFC85252"/>
-            <Button Content="修复" Canvas.Left="26" Canvas.Top="76" Width="102" Height="20" Background="#FF7EC853"/>
+            <Button Content="故障" Canvas.Left="26" Canvas.Top="102" Width="102" Height="20" Background="#FFC85252" Click="Button_Click_Error"/>
+            <Button Content="修复" Canvas.Left="26" Canvas.Top="76" Width="102" Height="20" Background="#FF7EC853" Click="Button_Click_Repair"/>
 
         </Canvas>
 
-        <TextBox Grid.Column="2" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Bottom" Width="100" Background="LightBlue" Name="elevator1" Margin="0,0,0,5"/>
-        <TextBox Grid.Column="3" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Bottom" Width="100" Background="LightBlue" Name="elevator2" Margin="0,0,0,5"/>
-        <TextBox Grid.Column="4" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Bottom" Width="100" Background="LightBlue" Name="elevator3" Margin="0,0,0,5"/>
-        <TextBox Grid.Column="5" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Bottom" Width="100" Background="LightBlue" Name="elevator4" Margin="0,0,0,5"/>
-        <TextBox Grid.Column="6" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Bottom" Width="100" Background="LightBlue" Name="elevator5" Margin="0,0,0,5"/>
+        <TextBox Grid.Column="2" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" Text="Elevator1" VerticalAlignment="Bottom" Width="100" Background="LightBlue" Name="elevator1" Margin="0,0,0,5" TabIndex="1"/>
+        <TextBox Grid.Column="3" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" Text="Elevator2" VerticalAlignment="Bottom" Width="100" Background="LightBlue" Name="elevator2" Margin="0,0,0,5" TabIndex="2"/>
+        <TextBox Grid.Column="4" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" Text="Elevator3" VerticalAlignment="Bottom" Width="100" Background="LightBlue" Name="elevator3" Margin="0,0,0,5" TabIndex="3"/>
+        <TextBox Grid.Column="5" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" Text="Elevator4" VerticalAlignment="Bottom" Width="100" Background="LightBlue" Name="elevator4" Margin="0,0,0,5" TabIndex="4"/>
+        <TextBox Grid.Column="6" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" Text="Elevator5" VerticalAlignment="Bottom" Width="100" Background="LightBlue" Name="elevator5" Margin="0,0,0,5" TabIndex="5"/>
 
         <Button Content="↓" Grid.Column="1" HorizontalAlignment="Left" Margin="80,0,0,575" VerticalAlignment="Bottom" Width="20" Height="20" Name="button60" Click="Button_Click_outRequest" TabIndex="40"/>
         <Button Content="↓" Grid.Column="1" HorizontalAlignment="Left" Margin="100,0,0,545" VerticalAlignment="Bottom" Width="20" Height="20" Name="button59" Click="Button_Click_outRequest" TabIndex="39"/>
@@ -143,5 +137,7 @@
         <Label Content="3" Grid.Column="1" HorizontalAlignment="Left" Margin="15,0,0,65" VerticalAlignment="Bottom" Width="25" Height="25"/>
         <Label Content="2" Grid.Column="1" HorizontalAlignment="Left" Margin="15,0,0,35" VerticalAlignment="Bottom" Width="25" Height="25"/>
         <Label Content="1" Grid.Column="1" HorizontalAlignment="Left" Margin="15,0,0,5" VerticalAlignment="Bottom" Width="25" Height="25"/>
+
+        <Label Grid.ColumnSpan="4" Name="LabelError" Grid.Column="2" HorizontalAlignment="Center" Height="201" Margin="0,169,43,0" VerticalAlignment="Top" Width="357" Background="Transparent" FontSize="72"/>
     </Grid>
 </Window>

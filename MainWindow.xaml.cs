@@ -23,19 +23,25 @@ using System.Collections.Specialized;
 
 namespace OS_Project_1
 {
-    /// <summary>
-    /// MainWindow.xaml 的交互逻辑
-    /// </summary>
+    //传信器：功能等同全局变量
+    //2->request未被分配;1->request已被分配; 0 ->noRequest;
+    //public class Messager {
+    //    static string name = "123";
+    //    static int []outRequest = new int[40]; }
+
     public partial class MainWindow : Window
     {
         public int currentElevator;                                         //当前框选电梯ID
 
         public DispatcherTimer timer = new DispatcherTimer();               //计时器
 
-        public ElevatorController[] elevator = new ElevatorController[5];   //电梯控制器实例
+        public ElevatorController[] elevator = new ElevatorController[5];   //电梯控制器实例         
 
-        private int[] outLightStatus = new int[20];                         //标识外部亮灯情况
-        private int[] buttonStatus = new int[40];                   
+        public int[] outRequestStatus = new int[40];                              //外部按钮请求状态: 2表示未分配；1表示已分配但未完成；0表示已完成
+
+        private int toAssign = 0;                                           //等待分配的请求数
+
+        private int[] whetherError = new int[5];                                     //0表示正常 1表示坏了
 
         public MainWindow()
         {
@@ -74,15 +80,12 @@ namespace OS_Project_1
             timer.Start();
             timer.Tick += new EventHandler(UpdateInMessage);
             timer.Tick += new EventHandler(UpdateOutMessage);
+            timer.Tick += new EventHandler(TargetAssign);
         }
 
         //v1.5 结构优化之后这里应根据请求状态变色
         //1.控制外部楼层灯
         //
-        private void UpdateLight(object sender,EventArgs e)
-        {
-
-        }
 
         public void UpdateInMessage(object sender, EventArgs e)
         {
@@ -100,14 +103,20 @@ namespace OS_Project_1
             if (elevator[currentElevator].eControl.eStatus == 0) labelStatus.Content = " - ";
             if (elevator[currentElevator].eControl.eStatus == -1) labelStatus.Content = "↓";
 
-
+            for (int i = 0; i < 5; i++)
+            {
+                if (elevator[i].eControl.eStatus == 0)
+                    elevator[i].elevatorText.Background = Brushes.LightBlue;
+                else
+                    elevator[i].elevatorText.Background = Brushes.ForestGreen;
+            }
             for (int i = 0; i < 20; i++)
             {
                 string buttonName = @"button";
                 buttonName += (i + 1).ToString();
                 Button obj = FindName(buttonName) as Button;
 
-                if (elevator[currentElevator].eControl.inLightStatus[i] == 1) { obj.Background = Brushes.ForestGreen; }
+                if (elevator[currentElevator].eControl.inLightStatus[i] == 1) { obj.Background = Brushes.OrangeRed; }
                 if (elevator[currentElevator].eControl.inLightStatus[i] == 0) { obj.Background = Brushes.White; }
             }
         }
@@ -118,47 +127,24 @@ namespace OS_Project_1
             //用于控制外部的上下请求灯  √
             //需要依靠Elevator 内部变量outTarget 来判断
 
-            //v2.0 优化1
+            //v2.0 
 
             for (int i = 0; i < 20; i++)
             {
-                string buttonName = @"button";
-                buttonName += (i + 21).ToString();
                 for (int j = 0; j < 5; j++)
                 {
-                    //Console.WriteLine("123123");
-                    if (elevator[j].eControl.outTarget[0][i] == 1)
-                    {
-                        TurnPressButton(FindName(buttonName) as Button);
-                        break;
-                    }
-                    TurnUnPressButton(FindName(buttonName) as Button);
-                }
-            }
-            for (int i = 20; i < 40; i++)
-            {
-                string buttonName = @"button";
-                buttonName += (i + 21).ToString();
-                for (int j = 0; j < 5; j++)
-                {
-                    if (elevator[j].eControl.outTarget[1][i - 20] == 1)
-                    {
-                        TurnPressButton(FindName(buttonName) as Button);
-                        break;
-                    }
-                    TurnUnPressButton(FindName(buttonName) as Button);
+                    if (elevator[j].eControl.outTarget[0][i] == 0)
+                        TurnUnPressButton(i + 21);
+                    if (elevator[j].eControl.outTarget[1][i] == 0)
+                        TurnUnPressButton(i + 41);
                 }
             }
         }
 
 
 
-
-
-
-
- //按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应//
- //按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应//
+        //按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应//
+        //按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应////按键响应//
 
         private void Button_Click_inRequest(object sender, RoutedEventArgs e)
         {
@@ -169,10 +155,8 @@ namespace OS_Project_1
 
             int buttonID = (sender as Button).TabIndex;
 
-            
             elevator[currentElevator].eControl.inLightStatus[buttonID - 1] = 1;     //亮灯
             elevator[currentElevator].eControl.inTarget[buttonID - 1] = 1;
-
 
             elevator[currentElevator].eControl.toDeal++;
         }
@@ -187,7 +171,43 @@ namespace OS_Project_1
 
             int buttonID = (sender as Button).TabIndex;
 
-            TargetAssign(sender, e, buttonID + 20);
+            TurnPressButton(buttonID + 20);
+            outRequestStatus[buttonID - 1] = 2;
+            toAssign++;
+        }
+
+        private void Button_Click_Error(object sender, RoutedEventArgs e)
+        {
+            elevator[currentElevator].ErrorCallback(FindName("LabelError") as Label);
+
+            for (int i = 0; i < 5; i++)
+            {
+                elevator[i].elevatorText.Background = Brushes.DarkRed;
+                while (true)
+                {
+                    Thread.Sleep(100);
+
+                }
+            }
+        }
+        private void Button_Click_Repair(object sender, RoutedEventArgs e)
+        {
+            elevator[currentElevator].RepairCallBack(FindName("LabelError") as Label);
+            for (int i = 0; i < 5; i++)
+            {
+                elevator[i].elevatorText.Background = Brushes.DarkRed;
+            }
+
+        }
+
+        private void Button_Click_Open(object sender, RoutedEventArgs e)
+        {
+            elevator[currentElevator].eControl.whetherStop = 1;
+        }
+
+        private void Button_Click_Close(object sender, RoutedEventArgs e)
+        {
+            elevator[currentElevator].eControl.whetherStop = 0;
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -197,15 +217,17 @@ namespace OS_Project_1
         }
 
         //v1.5 优化变色效果
-        private void TurnPressButton(Button obj)
+        private void TurnPressButton(int buttonID)
         {
-            //按钮处于按下状态
+            Button obj = (FindName("button" + buttonID.ToString())) as Button;
+
             obj.Background = Brushes.Red;
         }
 
-        private void TurnUnPressButton(Button obj)
+        private void TurnUnPressButton(int buttonID)
         {
-            //按钮处于松开状态
+            Button obj = (FindName("button" + buttonID.ToString())) as Button;
+
             obj.Background = Brushes.White;
         }
 
@@ -223,141 +245,158 @@ namespace OS_Project_1
         //  ②若没有同向电梯 ->在静止电梯中找到距离最近
         //Ⅲ分配Target
 
-        public void TargetAssign(object sender, EventArgs e,int buttonID)
+        public void TargetAssign(object sender, EventArgs e)
         {
+            if (toAssign == 0) return;
+
             int[] distance1 = new int[5];                           //顺路电梯距离请求的位置
             int[] distance2 = new int[5];                           //静止电梯距离请求的距离
 
             //inTarget
             //内部请求本身具有电梯指向性
             //因此不需要计算直接在Button响应中分配
-            //if (1 <= buttonID && buttonID <= 20) { }
 
-            //outUpTarget
-            if (21 <= buttonID && buttonID <= 40)
+            for (int i = 0; i < 40; i++)
             {
-                int floor = buttonID - 20;                              //请求楼层数
+                //对状态为2的进行分配并将其status标为1
+                if (outRequestStatus[i] != 2) continue;
 
-                for (int i = 0; i < 5; i++)
+                // buttonID = i + 1; 
+                //i:0->19 UpRequest
+                //i:20->39 DownRequest
+
+                //upButton
+                if (0 <= i && i <= 19)
                 {
-                    distance1[i] = 999; distance2[i] = 999;
-                }
+                    int floor = i + 1;                              //请求楼层数
 
-                for (int i = 0; i < 5; i++)
-                {
-                    if (elevator[i].eControl.eStatus == 1)
+                    for (int j = 0; j < 5; j++)
                     {
-                        if (elevator[i].eControl.currentFloor <= floor)
-                            distance1[i] = floor - elevator[i].eControl.currentFloor;
-                    }
-                    if (elevator[i].eControl.eStatus == 0)
-                    {
-                        distance2[i] = Math.Abs(floor - elevator[i].eControl.currentFloor);
-                    }
-                }
-
-                int closestEleID = -1;                                  //最近的电梯ID
-                int minDistance = 20;                                   //最近的距离
-
-                for (int i = 0; i < 5; i++)
-                    if (distance1[i] < minDistance)
-                    {
-                        minDistance = distance1[i];
-                        closestEleID = i;
+                        distance1[j] = 999;
+                        distance2[j] = 999;
                     }
 
-                if (minDistance < 20)
-                {
-                    elevator[closestEleID].eControl.outTarget[0][floor - 1] = 1;
-                    elevator[closestEleID].eControl.toDeal++;
-                    return;
-                }
-
-                minDistance = 20;
-                for (int i = 0; i < 5; i++)
-                    if (distance2[i] < minDistance)
+                    for (int j = 0; j < 5; j++)
                     {
-                        minDistance = distance2[i];
-                        closestEleID = i;
+                        //如果该电梯承担任务过多就调度下一部
+                        if (elevator[j].eControl.eStatus == 1 && elevator[j].eControl.toDeal <= 5)
+                        {
+                            if (elevator[j].eControl.currentFloor <= floor)
+                                distance1[j] = floor - elevator[j].eControl.currentFloor;
+                        }
+                        if (elevator[j].eControl.eStatus == 0)
+                        {
+                            distance2[j] = Math.Abs(floor - elevator[j].eControl.currentFloor);
+                        }
                     }
 
-                if (minDistance < 20)
-                {
-                    elevator[closestEleID].eControl.outTarget[0][floor - 1] = 1;
-                    elevator[closestEleID].eControl.toDeal++;
-                    return;
-                }
-            }
+                    int closestEleID = -1;                                  //最近的电梯ID
+                    int minDistance = 20;                                   //最近的距离
 
-            //putDownTarget
-            if (41 <= buttonID && buttonID <= 60)
-            {
-                int floor = buttonID - 40;
+                    for (int j = 0; j < 5; j++)
+                        if (distance1[j] < minDistance)
+                        {
+                            minDistance = distance1[j];
+                            closestEleID = j;
+                        }
 
-                for (int i = 0; i < 5; i++)
-                {
-                    distance1[i] = 999; distance2[i] = 999;
-                }
-
-                for (int i = 0; i < 5; i++)
-                {
-                    if (elevator[i].eControl.eStatus == -1)
+                    if (minDistance < 20)
                     {
-                        if (elevator[i].eControl.currentFloor >= floor)
-                            distance1[i] = elevator[i].eControl.currentFloor - floor;
+                        elevator[closestEleID].eControl.outTarget[0][floor - 1] = 1;
+                        elevator[closestEleID].eControl.toDeal++;
+                        outRequestStatus[i] = 1;
+                        toAssign--;
+                        continue;
                     }
-                    if (elevator[i].eControl.eStatus == 0)
+
+                    //如果没有顺路的电梯就找无任务静止的
+                    minDistance = 20;
+                    for (int j = 0; j < 5; j++)
+                        if (distance2[j] < minDistance)
+                        {
+                            minDistance = distance2[j];
+                            closestEleID = j;
+                        }
+
+                    if (minDistance < 20)
                     {
-                        distance2[i] = Math.Abs(floor - elevator[i].eControl.currentFloor);
+                        elevator[closestEleID].eControl.outTarget[0][floor - 1] = 1;
+                        elevator[closestEleID].eControl.toDeal++;
+                        outRequestStatus[i] = 1;
+                        toAssign--;
+                        continue;
                     }
                 }
 
-                int closestEleID = -1;                                  //最近的电梯ID
-                int minDistance = 20;                                   //最近的距离
+                //downButton
+                if (20 <= i && i <= 39)
+                {
+                    int floor = i - 19;
 
-                for (int i = 0; i < 5; i++)
-                    if (distance1[i] < minDistance)
+                    for (int j = 0; j < 5; j++)
                     {
-                        minDistance = distance1[i];
-                        closestEleID = i;
+                        distance1[j] = 999;
+                        distance2[j] = 999;
                     }
 
-                if (minDistance < 20)
-                {
-                    elevator[closestEleID].eControl.outTarget[1][floor - 1] = 1;
-                    elevator[closestEleID].eControl.toDeal++;
-                    return;
-                }
-
-                minDistance = 20;
-                for (int i = 0; i < 5; i++)
-                    if (distance2[i] < minDistance)  
+                    for (int j = 0; j < 5; j++)
                     {
-                        minDistance = distance2[i];
-                        closestEleID = i;
+                        if (elevator[j].eControl.eStatus == -1 && elevator[j].eControl.toDeal <= 5)
+                        {
+                            if (elevator[j].eControl.currentFloor >= floor)
+                                distance1[j] = elevator[j].eControl.currentFloor - floor;
+                        }
+                        if (elevator[j].eControl.eStatus == 0)
+                        {
+                            distance2[j] = Math.Abs(floor - elevator[j].eControl.currentFloor);
+                        }
                     }
-                if (minDistance < 20)
-                {
-                    elevator[closestEleID].eControl.outTarget[1][floor - 1] = 1;
-                    elevator[closestEleID].eControl.toDeal++;
-                    return;
+
+                    int closestEleID = -1;                                  //最近的电梯ID
+                    int minDistance = 20;                                   //最近的距离
+
+                    for (int j = 0; j < 5; j++)
+                        if (distance1[j] < minDistance)
+                        {
+                            minDistance = distance1[j];
+                            closestEleID = j;
+                        }
+
+                    if (minDistance < 20)
+                    {
+                        elevator[closestEleID].eControl.outTarget[1][floor - 1] = 1;
+                        elevator[closestEleID].eControl.toDeal++;
+                        outRequestStatus[i] = 1;
+                        toAssign--;
+                        continue;
+                    }
+
+                    minDistance = 20;
+                    for (int j = 0; j < 5; j++)
+                        if (distance2[j] < minDistance)
+                        {
+                            minDistance = distance2[j];
+                            closestEleID = j;
+                        }
+                    if (minDistance < 20)
+                    {
+                        elevator[closestEleID].eControl.outTarget[1][floor - 1] = 1;
+                        elevator[closestEleID].eControl.toDeal++;
+                        outRequestStatus[i] = 1;
+                        toAssign--;
+                        continue;
+                    }
                 }
             }
         }
 
-        private bool WhetherResponse_In(object sender, RoutedEventArgs e)
+        /*private bool WhetherResponse_In(object sender, RoutedEventArgs e)
         {
             //v1.5新增
             //判断是否要响应该指令
             //在Button 触发后第一时间被调用并进行判断
-
-            
             return true;
-        }
+        }*/
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-    }
+    } 
 }

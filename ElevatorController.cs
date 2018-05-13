@@ -7,6 +7,8 @@ using System.Windows.Shapes;
 using System.Windows;
 using System.Windows.Controls;
 using System.Threading;
+using System.Windows.Media;
+using OS_Project_1_v1;
 
 namespace OS_Project_1
 {
@@ -15,6 +17,7 @@ namespace OS_Project_1
 
     public class ElevatorController
     {
+        private bool ifNormal = true;
         public Elevator eControl = new Elevator();
         public TextBox elevatorText = new TextBox();
         
@@ -33,17 +36,26 @@ namespace OS_Project_1
 
             while (true)
             {
-                SetTarget();
-
-                if (WhetherStop())
+                if (ifNormal == true)
                 {
-                    this.eControl.eStatus = 0;
-                    this.ElvatorStop();
-                    Thread.Sleep(1500);
-                }
-                this.elevatorText.Dispatcher.Invoke(Move);
+                    SetTarget();
 
-                Thread.Sleep(500);
+                    if (WhetherStop())
+                    {
+                        this.eControl.eStatus = 0;
+                        this.ElvatorStop();
+
+                        while (eControl.whetherStop == 1)
+                        {
+                            eControl.whetherStop = 0;
+                            Thread.Sleep(1000);
+                        }
+                        Thread.Sleep(200);
+                    }
+                    this.elevatorText.Dispatcher.Invoke(Move);
+
+                    Thread.Sleep(1000);
+                }
             }
 
         }
@@ -58,35 +70,39 @@ namespace OS_Project_1
             //没有则do nothing
             if (eControl.eStatus == 1)
             {
-                for (int i = eControl.currentTarget - 1; i > eControl.currentFloor; i--)
+                for (int i = eControl.currentTarget - 2; i > eControl.currentFloor - 1; i--) 
                 {
                     if (eControl.inTarget[i] == 1)
                     {
                         eControl.currentTarget = i + 1;
                         eControl.typeOfOutTarget = -1;
+                        return; 
                     }
                     if (eControl.outTarget[0][i] == 1)
                     {
                         eControl.currentTarget = i + 1;
-                        eControl.typeOfOutTarget = 0;   
+                        eControl.typeOfOutTarget = 0;
+                        return;
                     }
                 }
             }
 
             //向下 ->需求同上
-            if (eControl.eStatus == -1)
+            if (eControl.eStatus == -1) 
             {
-                for (int i = eControl.currentTarget + 1; i < eControl.currentFloor; i++)
+                for (int i = eControl.currentTarget; i < eControl.currentFloor-2; i++)
                 {
                     if (eControl.inTarget[i] == 1)
                     {
                         eControl.currentTarget = i + 1;
                         eControl.typeOfOutTarget = -1;
+                        return;
                     }
                     if(eControl.outTarget[1][i] == 1)
                     {
                         eControl.currentTarget = i + 1;
                         eControl.typeOfOutTarget = 1;
+                        return;
                     }
                 }
             }
@@ -105,7 +121,7 @@ namespace OS_Project_1
                         break;
                     }
                 }
-                for (int i = eControl.currentFloor - 1; i >= 0; i--)
+                for (int i = eControl.currentFloor - 2; i >= 0; i--)
                 {
                     if (eControl.inTarget[i] == 1 || eControl.outTarget[0][i] == 1 || eControl.outTarget[1][i] == 1)
                     {
@@ -164,31 +180,33 @@ namespace OS_Project_1
             if (eControl.typeOfOutTarget == 0 || eControl.typeOfOutTarget == 1)
                 if (eControl.outTarget[eControl.typeOfOutTarget][floor - 1] == 1)
                     eControl.outTarget[eControl.typeOfOutTarget][floor - 1] = 0;
-
+            
             eControl.inLightStatus[floor - 1] = 0;
             eControl.toDeal--;
             eControl.currentTarget = -1;
 
-            return;
         }
 
-        //控制电梯内部按钮以及信息（上楼下楼开门）显示函数
-        /*private void UpdateMessage()
+        public void ErrorCallback(Label errorLabel)
         {
-            for(int i=0;i<20;i++)
-            {
-                if(eControl.inLightStatus[i]==1)
-                    TurnOnLight()
-                    
-            }
-        }
-        private void TurnOnLight()
-        {
+            errorLabel.Content = ("  Elevator " + elevatorText.TabIndex + "\n" + "     Error!");
+            errorLabel.FontSize = 72;
+            errorLabel.Background = Brushes.DarkRed;
 
+            ifNormal = false;
         }
-        private void TurnDownLight()
-        {
 
-        }*/
+        public void RepairCallBack(Label errorLabel)
+        {
+            errorLabel.Content = "";
+            errorLabel.Background = Brushes.Transparent;
+
+            ifNormal = true;
+        }
+
+        public bool DoorOpenCallBack() { return true; }
+
+        public bool DoorCloseCallBack() { return true; }
+
     }
 }
