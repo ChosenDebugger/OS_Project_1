@@ -17,7 +17,8 @@ namespace OS_Project_1
 
     public class ElevatorController
     {
-        private bool ifNormal = true;
+        public bool ifNormal = true;
+
         public Elevator eControl = new Elevator();
         public TextBox elevatorText = new TextBox();
         
@@ -45,9 +46,9 @@ namespace OS_Project_1
                         this.eControl.eStatus = 0;
                         this.ElvatorStop();
 
-                        while (eControl.whetherStop == 1)
+                        while (eControl.whetherWait == 1)
                         {
-                            eControl.whetherStop = 0;
+                            eControl.whetherWait = 0;
                             Thread.Sleep(1000);
                         }
                         Thread.Sleep(200);
@@ -193,6 +194,8 @@ namespace OS_Project_1
             errorLabel.FontSize = 16;
             errorLabel.Background = Brushes.DarkRed;
 
+            elevatorText.Background = Brushes.Red;
+
             ifNormal = false;
         }
 
@@ -200,6 +203,8 @@ namespace OS_Project_1
         {
             errorLabel.Content = "";
             errorLabel.Background = Brushes.Transparent;
+
+ 
 
             ifNormal = true;
         }

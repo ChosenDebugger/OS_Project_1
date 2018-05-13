@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OS_Project_1"
         mc:Ignorable="d"
-        Title="DeepDark♂Fantasy" Height="630" Width="800" ResizeMode="NoResize">
+        Title="Elevator" Height="630" Width="800" ResizeMode="NoResize">
 
-    <Grid Margin="0,0,0,0">
+    <Grid Margin="0,0,0,0" Background="#FFF6F4EB">
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150"/>

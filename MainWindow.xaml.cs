@@ -41,7 +41,6 @@ namespace OS_Project_1
 
         private int toAssign = 0;                                           //等待分配的请求数
 
-        private int[] whetherError = new int[5];                                     //0表示正常 1表示坏了
 
         public MainWindow()
         {
@@ -105,6 +104,8 @@ namespace OS_Project_1
 
             for (int i = 0; i < 5; i++)
             {
+                if (elevator[i].ifNormal == false) continue;
+
                 if (elevator[i].eControl.eStatus == 0)
                     elevator[i].elevatorText.Background = Brushes.LightBlue;
                 else
@@ -196,26 +197,23 @@ namespace OS_Project_1
 
         private void Button_Click_Error(object sender, RoutedEventArgs e)
         {
+            elevator[currentElevator].elevatorText.Background = Brushes.DarkRed;
             elevator[currentElevator].ErrorCallback(FindName("LabelError") as Label);
         }
         private void Button_Click_Repair(object sender, RoutedEventArgs e)
         {
             elevator[currentElevator].RepairCallBack(FindName("LabelError") as Label);
-            for (int i = 0; i < 5; i++)
-            {
-                elevator[i].elevatorText.Background = Brushes.DarkRed;
-            }
-
+            elevator[currentElevator].elevatorText.Background = Brushes.LightBlue;
         }
 
         private void Button_Click_Open(object sender, RoutedEventArgs e)
         {
-            elevator[currentElevator].eControl.whetherStop = 1;
+            elevator[currentElevator].eControl.whetherWait = 1;
         }
 
         private void Button_Click_Close(object sender, RoutedEventArgs e)
         {
-            elevator[currentElevator].eControl.whetherStop = 0;
+            elevator[currentElevator].eControl.whetherWait = 0;
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
